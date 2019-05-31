@@ -37,3 +37,22 @@ def predict_next_song():
         prediction_clean = idx_to_song[prediction.item()] # un-encode the prediction
 
     return prediction_clean
+
+@app.route('/generate-setlist', methods=['POST'])
+def generate_next_setlist():
+    # takes in a numpy array of length 150 representing encoded songs
+    if request.method == 'POST':
+        data = request.get_json()
+        generated_sequence = util.generate_full_setlist(model, data)
+        # un-encode the sequences
+        generated_sequence_clean = [idx_to_song[idx] for idx in generated_sequence]
+        input_sequence_clean = [idx_to_song[idx] for idx in data]
+
+    return generated_sequence_clean
+
+
+
+#------------------ Run Application ------------------ 
+if __name__ == '__main__':
+    load_models()
+    app.run()
