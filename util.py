@@ -33,3 +33,39 @@ def load_pickle_object(file_path):
     pickle_obj = pickle.load(pickle_in)
 
     return pickle_obj
+
+def generate_full_setlist(model, seed_setlist):
+    '''
+    Generate the remainder of a setlist given the previous 150 songs.
+    
+    Args:
+        model (.hdf5) - a Phish prediction tensorflow model
+        seed_setlist (ndarray) - encoded array of shape (150,)
+    
+    Returns:
+        setlist (list) - generated sequence of encoded songs to complete the show
+    
+    '''
+    
+    setlist = []
+    setlist_start = False
+    pred_count = 0
+    
+    # generate remainder of setlist
+    while setlist_start == False:
+        # truncate sequences
+        seq = pad_sequences([seed_setlist], maxlen=150, truncating='pre')[0]
+        # predict next song
+        next_song = model.predict_classes(np.array([seq])).item()
+        # increment prediction counter
+        pred_count += 1
+        # check if a new setlist start is predicted (and its not the first song)
+        if next_song == 8 and pred_count > 1:
+            setlist_start = True
+        else:
+            # append to generated list
+            setlist.append(next_song)
+            # update seed_setlist to re-run for the next song
+            seed_setlist = np.append(seed_setlist, next_song)
+            
+    return setlist
