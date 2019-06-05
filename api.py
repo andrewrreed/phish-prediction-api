@@ -22,7 +22,7 @@ def load_models():
     print('Successfully loaded the model.')
     return None
 
-#------------------ Create API's ------------------ 
+#------------------ Create API endpoints ------------------ 
 @app.route('/')
 def home_endpoint():
     return ('Take care of your shoes!')
